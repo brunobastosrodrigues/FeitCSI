@@ -135,7 +135,7 @@ int Netlink::nlExecCommand(Cmd &cmd)
 
     nl_cb_err(cb, NL_CB_CUSTOM, this->error_handler, &err);
     nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, this->finish_handler, &err);
-    nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, this->ack_handler, &err);
+    nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, cmd.blocking ? this->blocking_ack_handler : this->ack_handler, &err);
     nl_cb_set(cb, NL_CB_MSG_IN, NL_CB_CUSTOM, cmd.valid_handler ? cmd.valid_handler : this->nlValidHandler, this);
     while (err > 0)
     {
@@ -225,6 +225,12 @@ int Netlink::ack_handler(struct nl_msg *msg, void *arg)
 {
     int *ret = (int *)arg;
     *ret = 0;
+    return NL_STOP;
+}
+
+int Netlink::blocking_ack_handler(struct nl_msg *msg, void *arg)
+{
+    // ACK received but keep the receive loop alive for async events
     return NL_STOP;
 }
 

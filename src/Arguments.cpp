@@ -19,6 +19,7 @@
 #include "Arguments.h"
 #include "WiFIController.h"
 #include "rs.h"
+#include <sstream>
 
 const std::string VERSION = (std::string("FeitCSI ") + FEITCSI_VERSION);
 const char *argp_program_version = VERSION.c_str();
@@ -367,6 +368,25 @@ error_t Arguments::parse_opt(int key, char *arg, struct argp_state *state)
         {
             argp_failure(state, 1, 0, "FTM target mac address is not correct");
             exit(ARGP_ERR_UNKNOWN);
+        }
+        break;
+    }
+    case 'M':
+    {
+        args->macFilter.clear();
+        std::istringstream stream(arg);
+        std::string token;
+        while (std::getline(stream, token, ','))
+        {
+            std::array<uint8_t, ETH_ALEN> mac;
+            int res = sscanf(token.c_str(), "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
+                             &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
+            if (res != ETH_ALEN)
+            {
+                argp_failure(state, 1, 0, "Bad MAC in mac-filter list");
+                exit(ARGP_ERR_UNKNOWN);
+            }
+            args->macFilter.push_back(mac);
         }
         break;
     }

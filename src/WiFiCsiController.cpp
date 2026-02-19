@@ -50,6 +50,8 @@ int WiFiCsiController::listenToCsi()
         .device = if_nametoindex(MONITOR_INTERFACE_NAME),
         .handler = this->listenToCsiHandler,
         .valid_handler = this->processListenToCsiHandler,
+        .args = nullptr,
+        .blocking = true,
     };
 
     return this->nlExecCommand(cmd);
@@ -112,6 +114,24 @@ int WiFiCsiController::processListenToCsiHandler(struct nl_msg *msg, void *arg)
                     printf("masm csi\n");
                     if (!Arguments::arguments.strict || (Arguments::arguments.strict && (c->rawHeaderData.rateNflag & RATE_LEGACY_RATE_MSK) == Arguments::arguments.mcs))
                     {
+                        // MAC whitelist filter: skip if filter is set and srcMac not in list
+                        if (!Arguments::arguments.macFilter.empty())
+                        {
+                            bool matched = false;
+                            for (const auto &m : Arguments::arguments.macFilter)
+                            {
+                                if (memcmp(c->rawHeaderData.srcMac, m.data(), ETH_ALEN) == 0)
+                                {
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            if (!matched)
+                            {
+                                delete c;
+                                return NL_SKIP;
+                            }
+                        }
                         if (Arguments::arguments.verbose) {
                             printDetail(c);
                         }

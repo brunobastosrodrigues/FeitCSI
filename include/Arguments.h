@@ -22,6 +22,8 @@
 #include <string>
 #include <cstdint>
 #include <map>
+#include <vector>
+#include <array>
 #include <argp.h>
 #include "main.h"
 
@@ -61,6 +63,7 @@ struct Args
     uint8_t ftmBurstDuration;
     uint8_t mac[ETH_ALEN];
     uint8_t ftmTargetMac[ETH_ALEN];
+    std::vector<std::array<uint8_t, ETH_ALEN>> macFilter;
     std::string inputFile;
     std::map<enum processor, bool> processors;
 };
@@ -114,6 +117,7 @@ private:
         {"mode-delay", 'y', "SWAPTIME", 0, "Delay in ms between inject and ftm responder or measure and ftm initiator when modes are injectftmres|measureftm"},
         {"strict", 'z', 0, OPTION_ARG_OPTIONAL, "Strict mode: filter out values that do not contain a specific MCS"},
         {"mac", '#', "MAC", 0, "Default NICs MAC will be change to providing MAC xx:xx:xx:xx:xx:xx"},
+        {"mac-filter", 'M', "MACFILTER", 0, "Only report CSI for these source MACs (comma-separated xx:xx:xx:xx:xx:xx)"},
         {0}};
 };
 

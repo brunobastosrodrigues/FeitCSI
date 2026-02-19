@@ -51,6 +51,7 @@ struct Cmd
     int (*handler)(struct nl80211_state *state, struct nl_msg *msg, void *arg);
     int (*valid_handler)(struct nl_msg *msg, void *arg);
     void *args;
+    bool blocking;
 };
 
 class Netlink
@@ -69,6 +70,7 @@ private:
     static int error_handler(sockaddr_nl *nla, nlmsgerr *err, void *arg);
     static int finish_handler(nl_msg *msg, void *arg);
     static int ack_handler(nl_msg *msg, void *arg);
+    static int blocking_ack_handler(nl_msg *msg, void *arg);
     static int nlValidHandler(nl_msg *msg, void *arg);
 };
 
