@@ -310,16 +310,16 @@ const std::vector<uint32_t> Csi::getPilotIndices()
         switch (channelWidth)
         {
         case RATE_MCS_CHAN_WIDTH_20:
-            return EHT_20_PILOT_INDICES;
+            return HE_20_PILOT_INDICES;
             break;
         case RATE_MCS_CHAN_WIDTH_40:
-            return EHT_40_PILOT_INDICES;
+            return HE_40_PILOT_INDICES;
             break;
         case RATE_MCS_CHAN_WIDTH_80:
-            return EHT_80_PILOT_INDICES;
+            return HE_80_PILOT_INDICES;
             break;
         case RATE_MCS_CHAN_WIDTH_160:
-            return EHT_160_PILOT_INDICES;
+            return HE_160_PILOT_INDICES;
             break;
         case RATE_MCS_CHAN_WIDTH_320:
             return EHT_320_PILOT_INDICES;
