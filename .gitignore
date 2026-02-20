@@ -10,3 +10,4 @@ poznamky
 
 # Ignore compiled sources in any directory
 /**/*.o
+/.worktrees/
