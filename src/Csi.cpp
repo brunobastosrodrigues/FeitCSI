@@ -101,7 +101,7 @@ void Csi::fixCsiBug()
         return;
     }
 
-    if (this->format != RATE_MCS_VHT_MSK && this->format != RATE_MCS_HE_MSK)
+    if (this->format != RATE_MCS_VHT_MSK && this->format != RATE_MCS_HE_MSK && this->format != RATE_MCS_EHT_MSK)
     {
         return;
     }
@@ -121,6 +121,15 @@ void Csi::fixCsiBug()
         return;
     }
     else if (this->format == RATE_MCS_HE_MSK)
+    {
+        newSubcarrierSize = 1992;
+    }
+
+    if (this->format == RATE_MCS_EHT_MSK && this->rawHeaderData.numSubCarriers == 1992)
+    {
+        return;
+    }
+    else if (this->format == RATE_MCS_EHT_MSK)
     {
         newSubcarrierSize = 1992;
     }
@@ -153,7 +162,7 @@ void Csi::fixCsiBug()
                         continue;
                     }
                 }
-                if (this->format == RATE_MCS_HE_MSK)
+                if (this->format == RATE_MCS_HE_MSK || this->format == RATE_MCS_EHT_MSK)
                 {
                     if (n > 995 && n < 1024)
                     {
