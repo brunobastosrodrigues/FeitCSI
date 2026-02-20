@@ -35,6 +35,7 @@ public:
     void injectHT();
     void injectVHT();
     void injectHE();
+    void injectEHT();
 
 private:
     void send(uint32_t rateNFlags);

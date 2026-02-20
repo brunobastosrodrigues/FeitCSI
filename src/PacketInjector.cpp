@@ -54,6 +54,10 @@ void PacketInjector::inject()
     {
         this->injectHE();
     }
+    else if (Arguments::arguments.format == "EHT")
+    {
+        this->injectEHT();
+    }
 }
 
 void PacketInjector::injectNoHT()
@@ -144,6 +148,48 @@ void PacketInjector::injectHE()
         (Arguments::arguments.channelWidth == 40 ? RATE_MCS_CHAN_WIDTH_40 : 0) |
         (Arguments::arguments.channelWidth == 80 ? RATE_MCS_CHAN_WIDTH_80 : 0) |
         (Arguments::arguments.channelWidth == 160 ? RATE_MCS_CHAN_WIDTH_160 : 0) |
+        (Arguments::arguments.spatialStreams == 2 ? SPATIAL_STREAM : 0) |
+        (Arguments::arguments.spatialStreams == 2 ? RATE_MCS_ANT_AB_MSK : 0);
+    this->send(rateNFlags);
+}
+
+void PacketInjector::injectEHT()
+{
+    uint8_t mcs = 0;
+    if (RATE_MCS_CODE_MSK >= Arguments::arguments.mcs)
+    {
+        mcs = RATE_MCS_CODE_MSK & Arguments::arguments.mcs;
+    }
+
+    uint32_t ltf = 0;
+    if (Arguments::arguments.ltf == "2xLTF+0.8")
+    {
+        ltf = 0;
+    }
+    else if (Arguments::arguments.ltf == "2xLTF+1.6")
+    {
+        ltf = 1;
+    }
+    else if (Arguments::arguments.ltf == "4xLTF+0.8")
+    {
+        ltf = 2;
+    }
+    else if (Arguments::arguments.ltf == "4xLTF+3.2")
+    {
+        ltf = 3;
+    }
+    ltf = (ltf << RATE_MCS_HE_GI_LTF_POS) & RATE_MCS_HE_GI_LTF_MSK;
+
+    uint32_t rateNFlags =
+        RATE_MCS_EHT_MSK |
+        RATE_MCS_LDPC_MSK |
+        mcs |
+        Arguments::arguments.antenna |
+        ltf |
+        (Arguments::arguments.channelWidth == 40 ? RATE_MCS_CHAN_WIDTH_40 : 0) |
+        (Arguments::arguments.channelWidth == 80 ? RATE_MCS_CHAN_WIDTH_80 : 0) |
+        (Arguments::arguments.channelWidth == 160 ? RATE_MCS_CHAN_WIDTH_160 : 0) |
+        (Arguments::arguments.channelWidth == 320 ? RATE_MCS_CHAN_WIDTH_320 : 0) |
         (Arguments::arguments.spatialStreams == 2 ? SPATIAL_STREAM : 0) |
         (Arguments::arguments.spatialStreams == 2 ? RATE_MCS_ANT_AB_MSK : 0);
     this->send(rateNFlags);
