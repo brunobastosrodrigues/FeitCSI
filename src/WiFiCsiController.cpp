@@ -98,8 +98,9 @@ int WiFiCsiController::processListenToCsiHandler(struct nl_msg *msg, void *arg)
                 (c->channelWidth == RATE_MCS_CHAN_WIDTH_20 && Arguments::arguments.channelWidth == 20) ||
                 (c->channelWidth == RATE_MCS_CHAN_WIDTH_40 && Arguments::arguments.channelWidth == 40) ||
                 (c->channelWidth == RATE_MCS_CHAN_WIDTH_80 && Arguments::arguments.channelWidth == 80) ||
-                (c->channelWidth == RATE_MCS_CHAN_WIDTH_160 && Arguments::arguments.channelWidth == 160)
-            
+                (c->channelWidth == RATE_MCS_CHAN_WIDTH_160 && Arguments::arguments.channelWidth == 160) ||
+                (c->channelWidth == RATE_MCS_CHAN_WIDTH_320 && Arguments::arguments.channelWidth == 320)
+
             )
             {
                 if (
@@ -182,6 +183,9 @@ void WiFiCsiController::printDetail(Csi *c)
         break;
     case RATE_MCS_CHAN_WIDTH_160:
         Logger::log(info, true) << "Channel width: 160, ";
+        break;
+    case RATE_MCS_CHAN_WIDTH_320:
+        Logger::log(info, true) << "Channel width: 320, ";
         break;
     }
     switch (c->format)
