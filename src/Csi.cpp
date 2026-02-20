@@ -298,7 +298,24 @@ const std::vector<uint32_t> Csi::getPilotIndices()
         }
         break;
     case RATE_MCS_EHT_MSK:
-        // TODO WiFi 7
+        switch (channelWidth)
+        {
+        case RATE_MCS_CHAN_WIDTH_20:
+            return EHT_20_PILOT_INDICES;
+            break;
+        case RATE_MCS_CHAN_WIDTH_40:
+            return EHT_40_PILOT_INDICES;
+            break;
+        case RATE_MCS_CHAN_WIDTH_80:
+            return EHT_80_PILOT_INDICES;
+            break;
+        case RATE_MCS_CHAN_WIDTH_160:
+            return EHT_160_PILOT_INDICES;
+            break;
+        case RATE_MCS_CHAN_WIDTH_320:
+            return EHT_320_PILOT_INDICES;
+            break;
+        }
         break;
     }
     std::vector<uint32_t> v;
