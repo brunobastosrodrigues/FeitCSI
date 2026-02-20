@@ -331,6 +331,7 @@
                               <item id="HT" translatable="yes">HT</item>
                               <item id="VHT" translatable="yes">VHT</item>
                               <item id="HESU" translatable="yes">HESU</item>
+                              <item id="EHT" translatable="yes">EHT</item>
                             </items>
                           </object>
                           <packing>
@@ -437,6 +438,7 @@
                               <item id="HT40-" translatable="yes">HT40-</item>
                               <item id="80" translatable="yes">80</item>
                               <item id="160" translatable="yes">160</item>
+                              <item id="320" translatable="yes">320</item>
                             </items>
                           </object>
                           <packing>
