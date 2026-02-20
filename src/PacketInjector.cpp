@@ -161,8 +161,10 @@ void PacketInjector::injectEHT()
         mcs = RATE_MCS_CODE_MSK & Arguments::arguments.mcs;
     }
 
+    // EHT MU GI/LTF encoding (rs.h): 0=2xLTF+0.8, 1=2xLTF+1.6, 2=4xLTF+0.8, 3=4xLTF+3.2
+    // Note: 1xLTF is not valid for EHT MU -- default to 2xLTF+0.8 (value 0)
     uint32_t ltf = 0;
-    if (Arguments::arguments.ltf == "2xLTF+0.8")
+    if (Arguments::arguments.ltf == "1xLTF+0.8" || Arguments::arguments.ltf == "2xLTF+0.8")
     {
         ltf = 0;
     }
