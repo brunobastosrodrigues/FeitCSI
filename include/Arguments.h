@@ -91,10 +91,10 @@ private:
     /* The options we understand. */
     inline static struct argp_option options[] = {
         {"frequency", 'f', "FREQUENCY", 0, "Frequency to measure/inject CSI"},
-        {"channel-width", 'w', "CHANNELWIDTH", 0, "Channel width to measure/inject CSI. Possible values [20|40|HT40-|80|160]"},
+        {"channel-width", 'w', "CHANNELWIDTH", 0, "Channel width to measure/inject CSI. Possible values [20|40|HT40-|80|160|320]"},
         {"output-file", 'o', "FILE", 0, "Output file where measurements should be stored."},
         {"mcs", 'm', "MCS", 0, "Mcs index [0-11]"},
-        {"format", 'r', "FORMAT", 0, "Data frame format [NOHT|HT|VHT|HESU]"},
+        {"format", 'r', "FORMAT", 0, "Data frame format [NOHT|HT|VHT|HESU|EHT]"},
         {"spatial-streams", 's', "SPATIALSTREAMS", 0, "Number of spatial streams [1|2]"},
         {"guard-interval", 'g', "GUARDINTERVAL", 0, "Guard interval in ns [400|800]"},
         {"ltf", 'l', "LTF", 0, "HE LTF [2xLTF+0.8|2xLTF+1.6|4xLTF+3.2|4xLTF+0.8]"},

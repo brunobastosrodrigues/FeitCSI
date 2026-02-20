@@ -150,12 +150,12 @@ error_t Arguments::parse_opt(int key, char *arg, struct argp_state *state)
     case 'r':
     {
         args->format.assign(arg);
-        if (args->format == "NOHT" || args->format == "HT" || args->format == "VHT" || args->format == "HESU")
+        if (args->format == "NOHT" || args->format == "HT" || args->format == "VHT" || args->format == "HESU" || args->format == "EHT")
         {
         }
         else
         {
-            argp_failure(state, 1, 0, "Bad format. Possible values [NOHT|HT|VHT|HESU]");
+            argp_failure(state, 1, 0, "Bad format. Possible values [NOHT|HT|VHT|HESU|EHT]");
             exit(ARGP_ERR_UNKNOWN);
         }
         break;
@@ -293,7 +293,7 @@ error_t Arguments::parse_opt(int key, char *arg, struct argp_state *state)
         struct ChanMode chMode = WiFIController::getChanMode(arg);
         if (chMode.width == 0)
         {
-            argp_failure(state, 1, 0, "Bad bandwidth. Possible values of bandwidth are [20|40|HT40-|80|160]");
+            argp_failure(state, 1, 0, "Bad bandwidth. Possible values of bandwidth are [20|40|HT40-|80|160|320]");
             exit(ARGP_ERR_UNKNOWN);
         }
         args->bandwidth = arg;
