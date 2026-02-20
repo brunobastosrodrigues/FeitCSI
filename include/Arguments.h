@@ -93,7 +93,7 @@ private:
         {"frequency", 'f', "FREQUENCY", 0, "Frequency to measure/inject CSI"},
         {"channel-width", 'w', "CHANNELWIDTH", 0, "Channel width to measure/inject CSI. Possible values [20|40|HT40-|80|160|320]"},
         {"output-file", 'o', "FILE", 0, "Output file where measurements should be stored."},
-        {"mcs", 'm', "MCS", 0, "Mcs index [0-11]"},
+        {"mcs", 'm', "MCS", 0, "Mcs index [0-13]"},
         {"format", 'r', "FORMAT", 0, "Data frame format [NOHT|HT|VHT|HESU|EHT]"},
         {"spatial-streams", 's', "SPATIALSTREAMS", 0, "Number of spatial streams [1|2]"},
         {"guard-interval", 'g', "GUARDINTERVAL", 0, "Guard interval in ns [400|800]"},

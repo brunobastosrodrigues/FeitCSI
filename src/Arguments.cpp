@@ -139,9 +139,9 @@ error_t Arguments::parse_opt(int key, char *arg, struct argp_state *state)
     case 'm':
     {
         int mcs = std::atoi(arg);
-        if (mcs < 0 || mcs > 11)
+        if (mcs < 0 || mcs > 13)
         {
-            argp_failure(state, 1, 0, "Bad MCS index. Possible values [0-11]");
+            argp_failure(state, 1, 0, "Bad MCS index. Possible values [0-13]");
             exit(ARGP_ERR_UNKNOWN);
         }
         args->mcs = (uint8_t)mcs;
