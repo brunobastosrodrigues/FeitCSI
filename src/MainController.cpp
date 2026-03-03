@@ -279,7 +279,7 @@ void MainController::initInterface()
 
         if (!Arguments::arguments.existing) {
         // delete actual interfaces
-        for (InterfaceInfo interface : this->wifiController.interfaces)
+        for (const auto& interface : this->wifiController.interfaces)
         {
             if (Arguments::arguments.verbose)
             {
@@ -543,10 +543,10 @@ void MainController::restoreState()
     }
 
     if (!Arguments::arguments.existing) {
-    mainController->wifiController.removeInterface(MONITOR_INTERFACE_NAME);
-    mainController->wifiController.removeInterface(AP_INTERFACE_NAME);
+        mainController->wifiController.removeInterface(MONITOR_INTERFACE_NAME);
+        mainController->wifiController.removeInterface(AP_INTERFACE_NAME);
     }
-    for (InterfaceInfo interface : mainController->bkpInterfaces)
+    for (const auto& interface : mainController->bkpInterfaces)
     {
         if (Arguments::arguments.verbose)
         {

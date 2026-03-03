@@ -43,15 +43,34 @@ void WiFiCsiController::init()
 
 int WiFiCsiController::listenToCsi()
 {
+    const char *iface = MONITOR_INTERFACE_NAME;
+    if (Arguments::arguments.existing) {
+        static const char *candidates[] = {"mon0", "wlan0mon", "wlan1mon", MONITOR_INTERFACE_NAME, nullptr};
+        bool found = false;
+        for (int i = 0; candidates[i]; i++) {
+            if (if_nametoindex(candidates[i]) > 0) {
+                iface = candidates[i];
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            Logger::log(error) << "No monitor interface found for -E mode (tried mon0, wlan0mon, wlan1mon, " << MONITOR_INTERFACE_NAME << ")\n";
+            return -ENODEV;
+        }
+    }
+
+    unsigned int devIndex = if_nametoindex(iface);
+    if (devIndex == 0) {
+        Logger::log(error) << "Interface " << iface << " not found\n";
+        return -ENODEV;
+    }
+
     Cmd cmd{
         .id = NL80211_CMD_VENDOR,
         .idby = CIB_NETDEV,
         .nlFlags = 0,
-        .device = if_nametoindex(
-            Arguments::arguments.existing ?
-                (if_nametoindex("mon0") > 0 ? "mon0" :
-                 if_nametoindex("wlan0mon") > 0 ? "wlan0mon" : MONITOR_INTERFACE_NAME)
-                : MONITOR_INTERFACE_NAME),
+        .device = devIndex,
         .handler = this->listenToCsiHandler,
         .valid_handler = this->processListenToCsiHandler,
         .args = nullptr,
@@ -91,12 +110,12 @@ int WiFiCsiController::processListenToCsiHandler(struct nl_msg *msg, void *arg)
         if (attrs[IWL_MVM_VENDOR_ATTR_CSI_DATA])
         {
             dataLength = nla_len(attrs[IWL_MVM_VENDOR_ATTR_CSI_DATA]);
-            uint8_t rawCsi[dataLength];
             uint8_t *dataCsi = (uint8_t *)nla_data(attrs[IWL_MVM_VENDOR_ATTR_CSI_DATA]);
-            memcpy(rawCsi, dataCsi, dataLength);
 
             Csi *c = new Csi();
             c->loadFromMemory(header, dataCsi);
+
+            bool accepted = false;
 
             if (Arguments::arguments.format == "ALL" ||
                 (((c->channelWidth == RATE_MCS_CHAN_WIDTH_20 && Arguments::arguments.channelWidth == 20) ||
@@ -109,32 +128,30 @@ int WiFiCsiController::processListenToCsiHandler(struct nl_msg *msg, void *arg)
                   (c->format == RATE_MCS_HE_MSK && Arguments::arguments.format == "HESU") ||
                   (c->format == RATE_MCS_EHT_MSK && Arguments::arguments.format == "EHT"))))
             {
+                if (!Arguments::arguments.strict || (c->rawHeaderData.rateNflag & RATE_LEGACY_RATE_MSK) == Arguments::arguments.mcs)
                 {
-                    if (!Arguments::arguments.strict || (Arguments::arguments.strict && (c->rawHeaderData.rateNflag & RATE_LEGACY_RATE_MSK) == Arguments::arguments.mcs))
+                    // MAC whitelist filter
+                    bool mac_ok = Arguments::arguments.macFilter.empty();
+                    if (!mac_ok)
                     {
-                        // MAC whitelist filter: skip if filter is set and srcMac not in list
-                        if (!Arguments::arguments.macFilter.empty())
+                        for (const auto &m : Arguments::arguments.macFilter)
                         {
-                            bool matched = false;
-                            for (const auto &m : Arguments::arguments.macFilter)
+                            if (memcmp(c->rawHeaderData.srcMac, m.data(), ETH_ALEN) == 0)
                             {
-                                if (memcmp(c->rawHeaderData.srcMac, m.data(), ETH_ALEN) == 0)
-                                {
-                                    matched = true;
-                                    break;
-                                }
-                            }
-                            if (!matched)
-                            {
-                                delete c;
-                                return NL_SKIP;
+                                mac_ok = true;
+                                break;
                             }
                         }
+                    }
+                    if (mac_ok)
+                    {
+                        accepted = true;
                         if (Arguments::arguments.verbose) {
                             printDetail(c);
                         }
-                        if ( MainController::getInstance()->udpSocket ) {
-                            c->sendUDP(MainController::getInstance()->udpSocket);
+                        auto *mc = MainController::getInstance();
+                        if (mc->udpSocket) {
+                            c->sendUDP(mc->udpSocket);
                         } else {
                             c->save();
                         }
@@ -145,17 +162,25 @@ int WiFiCsiController::processListenToCsiHandler(struct nl_msg *msg, void *arg)
                             WiFiCsiController::csiQueueMutex.unlock();
                         }
                     }
-                    
                 }
+            }
+
+            // Free Csi if not handed off to plot queue
+            if (!accepted || !Arguments::arguments.plot)
+            {
+                delete c;
             }
         }
     }
 
     WiFiCsiController *wcc = (WiFiCsiController*) arg;
-    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    if (wcc->stopTime != 0 && wcc->stopTime < now)
+    if (wcc->stopTime != 0)
     {
-        return NL_OK;
+        auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        if (wcc->stopTime < now)
+        {
+            return NL_OK;
+        }
     }
 
     return NL_SKIP;
