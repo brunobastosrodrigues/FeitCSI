@@ -65,6 +65,7 @@ struct Args
     uint8_t ftmTargetMac[ETH_ALEN];
     std::vector<std::array<uint8_t, ETH_ALEN>> macFilter;
     std::string inputFile;
+    bool existing = false;
     std::map<enum processor, bool> processors;
 };
 
@@ -94,7 +95,7 @@ private:
         {"channel-width", 'w', "CHANNELWIDTH", 0, "Channel width to measure/inject CSI. Possible values [20|40|HT40-|80|160]"},
         {"output-file", 'o', "FILE", 0, "Output file where measurements should be stored."},
         {"mcs", 'm', "MCS", 0, "Mcs index [0-11]"},
-        {"format", 'r', "FORMAT", 0, "Data frame format [NOHT|HT|VHT|HESU]"},
+        {"format", 'r', "FORMAT", 0, "Data frame format [NOHT|HT|VHT|HESU|EHT|ALL]"},
         {"spatial-streams", 's', "SPATIALSTREAMS", 0, "Number of spatial streams [1|2]"},
         {"guard-interval", 'g', "GUARDINTERVAL", 0, "Guard interval in ns [400|800]"},
         {"ltf", 'l', "LTF", 0, "HE LTF [2xLTF+0.8|2xLTF+1.6|4xLTF+3.2|4xLTF+0.8]"},
@@ -118,6 +119,7 @@ private:
         {"strict", 'z', 0, OPTION_ARG_OPTIONAL, "Strict mode: filter out values that do not contain a specific MCS"},
         {"mac", '#', "MAC", 0, "Default NICs MAC will be change to providing MAC xx:xx:xx:xx:xx:xx"},
         {"mac-filter", 'M', "MACFILTER", 0, "Only report CSI for these source MACs (comma-separated xx:xx:xx:xx:xx:xx)"},
+        {"existing", 'E', 0, OPTION_ARG_OPTIONAL, "Use existing monitor interface (skip interface teardown/creation)"},
         {0}};
 };
 

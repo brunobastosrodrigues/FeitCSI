@@ -277,6 +277,7 @@ void MainController::initInterface()
         this->wifiController.getInterfaces();
         this->wifiController.getPhys();
 
+        if (!Arguments::arguments.existing) {
         // delete actual interfaces
         for (InterfaceInfo interface : this->wifiController.interfaces)
         {
@@ -291,6 +292,7 @@ void MainController::initInterface()
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         this->wifiController.createApInteface();
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        } // end if (!existing)
     }
     catch(const std::exception& e)
     {
@@ -311,8 +313,10 @@ void *MainController::measureCsi(void *arg)
 {
     try
     {
-        MainController::getInstance()->wifiController.setInterfaceUpDown(AP_INTERFACE_NAME, false);
-        MainController::getInstance()->wifiController.setInterfaceUpDown(MONITOR_INTERFACE_NAME, true);
+        if (!Arguments::arguments.existing) {
+            MainController::getInstance()->wifiController.setInterfaceUpDown(AP_INTERFACE_NAME, false);
+            MainController::getInstance()->wifiController.setInterfaceUpDown(MONITOR_INTERFACE_NAME, true);
+        }
         WiFiCsiController wcs;
         wcs.init();
         wcs.listenToCsi();
@@ -488,8 +492,10 @@ void *MainController::injectPackets(void *arg)
 {
     try
     {
-        MainController::getInstance()->wifiController.setInterfaceUpDown(AP_INTERFACE_NAME, false);
-        MainController::getInstance()->wifiController.setInterfaceUpDown(MONITOR_INTERFACE_NAME, true);
+        if (!Arguments::arguments.existing) {
+            MainController::getInstance()->wifiController.setInterfaceUpDown(AP_INTERFACE_NAME, false);
+            MainController::getInstance()->wifiController.setInterfaceUpDown(MONITOR_INTERFACE_NAME, true);
+        }
         PacketInjector pi;
         if (Arguments::arguments.injectRepeat)
         {
@@ -536,8 +542,10 @@ void MainController::restoreState()
         pthread_cancel(mainController->injectPacketThread);
     }
 
+    if (!Arguments::arguments.existing) {
     mainController->wifiController.removeInterface(MONITOR_INTERFACE_NAME);
     mainController->wifiController.removeInterface(AP_INTERFACE_NAME);
+    }
     for (InterfaceInfo interface : mainController->bkpInterfaces)
     {
         if (Arguments::arguments.verbose)

@@ -150,12 +150,12 @@ error_t Arguments::parse_opt(int key, char *arg, struct argp_state *state)
     case 'r':
     {
         args->format.assign(arg);
-        if (args->format == "NOHT" || args->format == "HT" || args->format == "VHT" || args->format == "HESU")
+        if (args->format == "NOHT" || args->format == "HT" || args->format == "VHT" || args->format == "HESU" || args->format == "EHT" || args->format == "ALL")
         {
         }
         else
         {
-            argp_failure(state, 1, 0, "Bad format. Possible values [NOHT|HT|VHT|HESU]");
+            argp_failure(state, 1, 0, "Bad format. Possible values [NOHT|HT|VHT|HESU|EHT|ALL]");
             exit(ARGP_ERR_UNKNOWN);
         }
         break;
@@ -390,6 +390,9 @@ error_t Arguments::parse_opt(int key, char *arg, struct argp_state *state)
         }
         break;
     }
+    case 'E':
+        args->existing = true;
+        break;
     case ARGP_KEY_ARG:
     case ARGP_KEY_END:
         if (args->frequency == 0 ||

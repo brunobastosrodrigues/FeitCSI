@@ -47,7 +47,11 @@ int WiFiCsiController::listenToCsi()
         .id = NL80211_CMD_VENDOR,
         .idby = CIB_NETDEV,
         .nlFlags = 0,
-        .device = if_nametoindex(MONITOR_INTERFACE_NAME),
+        .device = if_nametoindex(
+            Arguments::arguments.existing ?
+                (if_nametoindex("mon0") > 0 ? "mon0" :
+                 if_nametoindex("wlan0mon") > 0 ? "wlan0mon" : MONITOR_INTERFACE_NAME)
+                : MONITOR_INTERFACE_NAME),
         .handler = this->listenToCsiHandler,
         .valid_handler = this->processListenToCsiHandler,
         .args = nullptr,
@@ -94,24 +98,18 @@ int WiFiCsiController::processListenToCsiHandler(struct nl_msg *msg, void *arg)
             Csi *c = new Csi();
             c->loadFromMemory(header, dataCsi);
 
-            if (
-                (c->channelWidth == RATE_MCS_CHAN_WIDTH_20 && Arguments::arguments.channelWidth == 20) ||
-                (c->channelWidth == RATE_MCS_CHAN_WIDTH_40 && Arguments::arguments.channelWidth == 40) ||
-                (c->channelWidth == RATE_MCS_CHAN_WIDTH_80 && Arguments::arguments.channelWidth == 80) ||
-                (c->channelWidth == RATE_MCS_CHAN_WIDTH_160 && Arguments::arguments.channelWidth == 160)
-            
-            )
+            if (Arguments::arguments.format == "ALL" ||
+                (((c->channelWidth == RATE_MCS_CHAN_WIDTH_20 && Arguments::arguments.channelWidth == 20) ||
+                  (c->channelWidth == RATE_MCS_CHAN_WIDTH_40 && Arguments::arguments.channelWidth == 40) ||
+                  (c->channelWidth == RATE_MCS_CHAN_WIDTH_80 && Arguments::arguments.channelWidth == 80) ||
+                  (c->channelWidth == RATE_MCS_CHAN_WIDTH_160 && Arguments::arguments.channelWidth == 160)) &&
+                 ((c->format == RATE_MCS_LEGACY_OFDM_MSK && Arguments::arguments.format == "NOHT") ||
+                  (c->format == RATE_MCS_HT_MSK && Arguments::arguments.format == "HT") ||
+                  (c->format == RATE_MCS_VHT_MSK && Arguments::arguments.format == "VHT") ||
+                  (c->format == RATE_MCS_HE_MSK && Arguments::arguments.format == "HESU") ||
+                  (c->format == RATE_MCS_EHT_MSK && Arguments::arguments.format == "EHT"))))
             {
-                if (
-                    (c->format == RATE_MCS_LEGACY_OFDM_MSK && Arguments::arguments.format == "NOHT") ||
-                    (c->format == RATE_MCS_HT_MSK && Arguments::arguments.format == "HT") ||
-                    (c->format == RATE_MCS_VHT_MSK && Arguments::arguments.format == "VHT") ||
-                    (c->format == RATE_MCS_HE_MSK && Arguments::arguments.format == "HESU") ||
-                    (c->format == RATE_MCS_EHT_MSK && Arguments::arguments.format == "EHT")
-                
-                )
                 {
-                    printf("masm csi\n");
                     if (!Arguments::arguments.strict || (Arguments::arguments.strict && (c->rawHeaderData.rateNflag & RATE_LEGACY_RATE_MSK) == Arguments::arguments.mcs))
                     {
                         // MAC whitelist filter: skip if filter is set and srcMac not in list
