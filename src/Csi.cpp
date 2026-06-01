@@ -18,6 +18,7 @@
 
 #include "Csi.h"
 #include <cstring>
+#include <chrono>
 #include <string>
 #include <fstream>
 #include <iterator>
@@ -58,7 +59,7 @@ void Csi::loadFromMemory(uint8_t *pHeader, uint8_t *pRawCsiData)
     memcpy(&this->rawHeaderData, pHeader, CSI_HEADER_LENGTH);
     this->rawCsiData = new uint8_t[this->rawHeaderData.csiDataSize];
     memcpy(this->rawCsiData, pRawCsiData, this->rawHeaderData.csiDataSize);
-    //this->rawHeaderData.timestamp = (uint64_t)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    this->rawHeaderData.timestamp = (uint64_t)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
     this->processRawCsi();
 }
@@ -68,6 +69,7 @@ void Csi::loadFromMemory(uint8_t *rawData)
     memcpy(&this->rawHeaderData, rawData, CSI_HEADER_LENGTH);
     this->rawCsiData = new uint8_t[this->rawHeaderData.csiDataSize];
     memcpy(this->rawCsiData, &rawData[CSI_HEADER_LENGTH], this->rawHeaderData.csiDataSize);
+    this->rawHeaderData.timestamp = (uint64_t)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     this->processRawCsi();
 }
 
